@@ -1,0 +1,31 @@
+---
+title: "Problem Set 1"
+output: html_document
+---
+By: **Feridun Mert Celebi**, STAT 365, February 05, 2016
+
+Data Analysis
+----------------------------------
+
+In the prediction part of this problem set we learned it is really difficult to make predictions with high degree of accuracy given the size of the data and variability in the data. As you can see in the first plot, it is really difficult to make predictions just using $pickup latitude$ and $pickup longitude$. There is so much overlap that it is really difficult to expect that knn is performing well. This is most likely true for both linear regression models as well. However, $pickup_hour$ is in my opinion a better variable to choose and a potential combination of $pickup_hour$ with $pickup latitude$ and $pickup longitude$ could yield more accurate results.
+
+```{r}
+nyc_train <- read.csv("~/Desktop/Yale/Yale Spring 2016/STAT 365/Assignments/PS1/nyc_train.csv")
+
+sample_nyc <- nyc_train[sample(1:nrow(nyc_train), 20000), ]
+to_plot <- sample_nyc[, c("pickup_longitude", "pickup_latitude", "dropoff_BoroCode")]
+
+to_plot[c(3)] <- unlist(lapply(to_plot[, 3], function(x) if (x != 1) 1 else 0))
+
+plot(to_plot$pickup_longitude, to_plot$pickup_latitude, xlab = "Pickup Longitude", ylab = "Pickup Latitude", col = ifelse(to_plot$dropoff_BoroCode == 1,'red', 'black'), pch = 19)
+```
+
+These were interesting findings, but NYC Cab Data provides many more interesting variables that we can utilize to improve our predictions. One variable is $vendor id$. This may seem peculiar at first, but there may be a meaningful relationship between vendors and particular neighborhoods they serve. For example, some vendor may be used specifically to carry passengers to NY airports etc. Obviously, this is a long shot.
+
+Another idea would be take a look at the $trip distance$ variable. If we create an additive model that combines the $trip distance$ with $pickup latitude$ and $pickup longitude$ variables, we can improve the accuracy of our predictions. This relies on the assumption that we have a good understanding of the overall area of Manhattan.
+
+You can see the plot (using a random sample of the NYC Cab Training Data) below to observe that some of these variables may actually provide valuable insights. Obviously, for the sake of brevity, I did not provide any further analysis or testing of these variables, but a multi-layered model where we eliminate test data point in steps based on multiple variables could provide better predictions.
+
+```{r}
+plot(sample_nyc[, c("passenger_count", "trip_distance", "vendor_id", "total_amount", "dropoff_BoroCode")])
+```
